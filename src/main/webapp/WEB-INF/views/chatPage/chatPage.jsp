@@ -33,7 +33,7 @@
 <body>
 
 <div class="container chat-container">
-    <h2 class="text-center">STOMP 채팅</h2>
+    <h2 class="text-center">${roomId}번 채팅방</h2>
 
     <div class="form-group">
         <label for="nickname">닉네임</label>
@@ -57,6 +57,9 @@
 
 <script>
     let stompClient = null;
+    let roomId = ${roomId};
+
+    console.log("채팅 방 번호 : "+${roomId});
 
     function connect() {
         let socket = new SockJS('/ws');
@@ -64,7 +67,7 @@
 
         stompClient.connect({}, function (frame) {
             console.log('STOMP 연결됨: ' + frame);
-            stompClient.subscribe('/topic/chat', function (message) {
+            stompClient.subscribe("/topic/chat/"+roomId, function (message) {
                 let response = JSON.parse(message.body);
                 console.log("받은 메시지:", response);
                 console.log("response.nickname:", response.nickname);
@@ -84,7 +87,7 @@
         }
 
         if (stompClient && message.trim() !== "") {
-            stompClient.send("/app/chat", {}, JSON.stringify({'nickname': nickname, 'content': message}));
+            stompClient.send("/app/chat/"+roomId, {}, JSON.stringify({'nickname': nickname, 'content': message}));
             document.getElementById("messageInput").value = "";
         }
     }
